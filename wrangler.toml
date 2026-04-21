@@ -1,0 +1,10 @@
+name = "cf-ai-chat"
+main = "index.js"
+compatibility_date = "2026-04-21"
+
+[env]
+AI = { binding = "AI", type = "ai" }
+
+[[kv_namespaces]]
+binding = "CONVERSATIONS"
+id = "<你的 KV 命名空间 ID>"
