@@ -124,120 +124,212 @@ function INDEX_HTML() {
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kimi Chat</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kimi Chat</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f5f5f5;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #1e1e1e;   /* 深色背景 */
+  color: #eee;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 15px 10px;
-      background: #f5f5f5;
-      scrollbar-width: thin;
-    }
+#chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px 10px;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-    .msg {
-      padding: 12px 16px;
-      margin: 8px 0;
-      border-radius: 18px;
-      max-width: 85%;
-      line-height: 1.45;
-      font-size: 15.5px;
-      word-wrap: break-word;
-    }
+.msg {
+  padding: 12px 16px;
+  margin: 4px 0;
+  border-radius: 18px;
+  max-width: 85%;
+  min-width: 50px;
+  line-height: 1.45;
+  font-size: 15.5px;
+  word-wrap: break-word;
+  display: inline-block;
+  animation: fadeIn 0.2s ease-in;
+}
 
-    .user {
-      background: #007bff;
-      color: white;
-      margin-left: auto;
-      border-bottom-right-radius: 4px;
-    }
+.user {
+  background: #007bff;
+  color: white;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
 
-    .ai {
-      background: white;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      margin-right: auto;
-      border-bottom-left-radius: 4px;
-    }
+.ai {
+  background: #2c2c2c;
+  color: #eee;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+  position: relative;
+}
 
-    #bar {
-      padding: 10px 12px;
-      background: white;
-      border-top: 1px solid #ddd;
-      display: flex;
-      gap: 8px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
+/* Markdown 渲染样式 */
+.ai p { margin: 0.6em 0; }
+.ai p:first-child { margin-top: 0; }
+.ai p:last-child { margin-bottom: 0; }
+.ai h1, .ai h2, .ai h3, .ai h4, .ai h5, .ai h6 {
+  margin: 0.8em 0 0.4em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.ai h1 { font-size: 1.35em; }
+.ai h2 { font-size: 1.25em; }
+.ai h3 { font-size: 1.15em; }
+.ai ul, .ai ol {
+  margin: 0.5em 0;
+  padding-left: 1.4em;
+}
+.ai li { margin: 0.2em 0; }
+.ai pre {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  margin: 0.6em 0;
+  position: relative;
+}
+.ai .copy-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  background: #444;
+  color: #ddd;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.ai pre:hover .copy-btn {
+  opacity: 1;
+}
+.ai .copy-btn:hover {
+  background: #555;
+}
+.ai code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+.ai pre code {
+  background: transparent;
+  padding: 0;
+  color: #d4d4d4;
+}
+.ai :not(pre) > code {
+  background: #3a3a3a;
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: #ff7b72;
+}
+.ai blockquote {
+  border-left: 3px solid #555;
+  margin: 0.6em 0;
+  padding-left: 12px;
+  color: #bbb;
+}
+.ai table {
+  border-collapse: collapse;
+  margin: 0.6em 0;
+  width: 100%;
+}
+.ai th, .ai td {
+  border: 1px solid #444;
+  padding: 6px 10px;
+  text-align: left;
+}
+.ai th {
+  background: #333;
+}
+.ai hr {
+  border: none;
+  border-top: 1px solid #444;
+  margin: 0.8em 0;
+}
+.ai a { color: #58a6ff; }
+.ai img { max-width: 100%; border-radius: 6px; }
 
-    #input {
-      flex: 1;
-      padding: 14px 16px;
-      border: 1px solid #ddd;
-      border-radius: 25px;
-      font-size: 16px;           /* 防止移动端自动缩放 */
-      outline: none;
-    }
+.loading::after {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  text-align: left;
+  animation: dots 1s steps(4, end) infinite;
+}
 
-    button {
-      padding: 0 20px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 25px;
-      font-size: 16px;
-      min-width: 60px;
-      cursor: pointer;
-    }
+@keyframes dots {
+  0% { content: ""; }
+  25% { content: "."; }
+  50% { content: ".."; }
+  75% { content: "..."; }
+  100% { content: ""; }
+}
 
-    button:active {
-      background: #0062cc;
-    }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    /* 移动端优化 */
-    @media (max-width: 768px) {
-      #chat {
-        padding: 12px 8px;
-      }
-      
-      .msg {
-        max-width: 92%;
-        padding: 11px 14px;
-        font-size: 15.5px;
-      }
+#bar {
+  padding: 10px 12px;
+  background: #2c2c2c;
+  border-top: 1px solid #444;
+  display: flex;
+  gap: 8px;
+}
 
-      #bar {
-        padding: 8px 10px;
-      }
+#input {
+  flex: 1;
+  padding: 14px 16px;
+  border: 1px solid #444;
+  border-radius: 25px;
+  font-size: 16px;
+  outline: none;
+  background: #1e1e1e;
+  color: #eee;
+}
 
-      #input {
-        padding: 13px 16px;
-      }
-    }
+button {
+  padding: 0 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  min-width: 60px;
+  cursor: pointer;
+}
 
-    /* 超小屏额外优化 */
-    @media (max-width: 480px) {
-      .msg {
-        max-width: 95%;
-      }
-    }
-  </style>
+button:active {
+  background: #0062cc;
+}
 
+@media (max-width: 768px) {
+  #chat { padding: 12px 8px; }
+  .msg { max-width: 92%; padding: 11px 14px; font-size: 15.5px; }
+  #bar { padding: 8px 10px; }
+  #input { padding: 13px 16px; }
+}
+
+@media (max-width: 480px) { .msg { max-width: 95%; } }
+</style>
 </head>
 
 <body>
@@ -245,18 +337,45 @@ function INDEX_HTML() {
 <div id="chat"></div>
 
 <div id="bar">
-<input id="input">
+<input id="input" placeholder="输入消息...">
 <button onclick="sendMessage()">发送</button>
 </div>
+
+<!-- 在 body 结束前引入 marked -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
 const chat = document.getElementById("chat")
 const userId = Math.random().toString(36)
 
-function add(role, text) {
+function addCopyButtons(container) {
+  container.querySelectorAll("pre").forEach(pre => {
+    if (pre.querySelector(".copy-btn")) return
+    const btn = document.createElement("button")
+    btn.className = "copy-btn"
+    btn.textContent = "复制"
+    btn.onclick = () => {
+      const code = pre.querySelector("code")
+      const text = code ? code.innerText : pre.innerText
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = "已复制"
+        setTimeout(() => btn.textContent = "复制", 1500)
+      }).catch(() => {
+        btn.textContent = "失败"
+        setTimeout(() => btn.textContent = "复制", 1500)
+      })
+    }
+    pre.appendChild(btn)
+  })
+}
+
+function add(role, text="", loading=false) {
   const div = document.createElement("div")
   div.className = "msg " + role
-  div.innerText = text
+  if (loading) div.classList.add("loading")
+  // 初始可以为空
+  div.innerHTML = text ? marked.parse(text) : ""
+  if (text) addCopyButtons(div)
   chat.appendChild(div)
   chat.scrollTop = chat.scrollHeight
   return div
@@ -270,7 +389,7 @@ async function sendMessage() {
   add("user", text)
   input.value = ""
 
-  const aiBox = add("ai", "")   // 空的 AI 消息框
+  const aiBox = add("ai", "", true)  // loading 动画
 
   try {
     const res = await fetch("/api/chat", {
@@ -280,79 +399,68 @@ async function sendMessage() {
     })
 
     if (!res.ok) {
-      aiBox.innerText = "请求失败"
+      aiBox.innerHTML = "<em>请求失败</em>"
+      aiBox.classList.remove("loading")
       return
     }
 
     const reader = res.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ""
+    let mdText = ""   // 累积原始 Markdown 文本
+    aiBox.innerHTML = ""
+    aiBox.classList.remove("loading")
 
     while (true) {
       const { value, done } = await reader.read()
       if (done) break
-
       buffer += decoder.decode(value, { stream: true })
-
       const lines = buffer.split("\\n")
       buffer = lines.pop() || ""
 
       for (const line of lines) {
         const trimmed = line.trim()
         if (!trimmed) continue
-
         if (trimmed.startsWith("data: ")) {
           const dataStr = trimmed.slice(6).trim()
           if (dataStr === "[DONE]" || dataStr === "") continue
 
           try {
             const parsed = JSON.parse(dataStr)
-
-            // === 关键解析逻辑（适配你现在的流格式）===
             let token = ""
-
             if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta) {
               const delta = parsed.choices[0].delta
-              // 优先取 reasoning_content（你模型输出的大部分内容在这里）
-              if (delta.reasoning_content) {
-                token = delta.reasoning_content
-              } 
-              // 再取普通 content（最终回答部分）
-              else if (delta.content) {
-                token = delta.content
-              }
-            } 
-            // 兼容最后总结的 response 字段
-            else if (parsed.response) {
-              token = parsed.response
-            }
+              if (delta.reasoning_content) token = delta.reasoning_content
+              else if (delta.content) token = delta.content
+            } else if (parsed.response) token = parsed.response
 
             if (token) {
-              aiBox.innerText += token
+              mdText += token
+              aiBox.innerHTML = marked.parse(mdText)
+              addCopyButtons(aiBox)
               chat.scrollTop = chat.scrollHeight
             }
-          } catch (e) {
-            // 解析失败时尝试直接追加（保底）
+          } catch(e) {
+            // 解析失败时，直接把原始数据当文本追加
             if (dataStr && dataStr !== "[DONE]") {
-              aiBox.innerText += dataStr
+              mdText += dataStr
+              aiBox.innerHTML = marked.parse(mdText)
+              addCopyButtons(aiBox)
               chat.scrollTop = chat.scrollHeight
             }
           }
         }
       }
     }
-  } catch (err) {
+  } catch(err) {
     console.error("Stream error:", err)
-    aiBox.innerText += "[发生错误]"
+    aiBox.innerHTML += "<em>[发生错误]</em>"
   }
 }
 
 const input = document.getElementById("input")
 input.addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault()   
-    sendMessage()
-  }
+  if (e.key === "Enter") { e.preventDefault(); sendMessage() }
 })
 </script>
 
