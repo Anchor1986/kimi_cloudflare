@@ -3,7 +3,8 @@ main = "index.js"
 compatibility_date = "2026-04-21"
 
 [env]
-AI = { binding = "AI", type = "ai" }
+[[AI]]
+binding = "AI"
 
 [[kv_namespaces]]
 binding = "CONVERSATIONS"
