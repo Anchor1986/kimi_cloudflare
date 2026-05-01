@@ -7,4 +7,4 @@ AI = { binding = "AI", type = "ai" }
 
 [[kv_namespaces]]
 binding = "CONVERSATIONS"
-id = "<你的 KV 命名空间 ID>"
+id = "794e0c7f29854069885dab4508629b04"
