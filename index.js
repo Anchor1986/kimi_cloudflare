@@ -186,6 +186,7 @@ body {
   margin-right: auto;
   border-bottom-left-radius: 4px;
   position: relative;
+  padding-bottom: 40px;
 }
 
 /* Markdown 渲染样式 */
@@ -274,6 +275,36 @@ body {
 }
 .ai a { color: #58a6ff; }
 .ai img { max-width: 100%; border-radius: 6px; }
+
+/* 消息复制按钮 */
+.msg-copy-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  padding: 4px 12px;
+  font-size: 12px;
+  background: #3a3a3a;
+  color: #aaa;
+  border: 1px solid #4a4a4a;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s;
+}
+
+.ai:hover .msg-copy-btn {
+  opacity: 1;
+}
+
+.msg-copy-btn:hover {
+  background: #4a4a4a;
+  color: #fff;
+  border-color: #5a5a5a;
+}
+
+.msg-copy-btn:active {
+  background: #2a2a2a;
+}
 
 /* 推理内容样式 */
 .reasoning-container {
@@ -439,6 +470,36 @@ function addCopyButtons(container) {
   })
 }
 
+function addMessageCopyButton(msgDiv) {
+  if (msgDiv.classList.contains('user')) return
+  if (msgDiv.querySelector('.msg-copy-btn')) return
+  
+  const btn = document.createElement('button')
+  btn.className = 'msg-copy-btn'
+  btn.textContent = '复制'
+  btn.onclick = (e) => {
+    e.stopPropagation()
+    // 获取消息的纯文本内容
+    const clone = msgDiv.cloneNode(true)
+    // 移除复制按钮
+    const copyBtns = clone.querySelectorAll('.copy-btn, .msg-copy-btn')
+    copyBtns.forEach(btn => btn.remove())
+    // 移除推理部分的标题
+    const reasoningHeaders = clone.querySelectorAll('.reasoning-header')
+    reasoningHeaders.forEach(header => header.remove())
+    
+    const text = clone.innerText.trim()
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '已复制'
+      setTimeout(() => btn.textContent = '复制', 1500)
+    }).catch(() => {
+      btn.textContent = '失败'
+      setTimeout(() => btn.textContent = '复制', 1500)
+    })
+  }
+  msgDiv.appendChild(btn)
+}
+
 function add(role, text="", loading=false) {
   const div = document.createElement("div")
   div.className = "msg " + role
@@ -576,9 +637,14 @@ async function sendMessage() {
         }
       }
     }
+    
+    // 流式传输完成后，添加消息复制按钮
+    addMessageCopyButton(aiBox)
+    
   } catch(err) {
     console.error("Stream error:", err)
     aiBox.innerHTML += "<em>[发生错误]</em>"
+    addMessageCopyButton(aiBox)
   }
 }
 
